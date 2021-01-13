@@ -10,6 +10,7 @@ using System.Net;
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
 using Microsoft.Azure.Storage.DataMovement;
+using Microsoft.Extensions.Configuration;
 
 namespace UploadImagesCore
 {
@@ -21,15 +22,24 @@ namespace UploadImagesCore
 
         static int Main(string[] args)
         {
-            if (args.Length == 0)
+
+            var builder = new ConfigurationBuilder()
+                .AddUserSecrets<Program>()
+                .AddCommandLine(args);
+
+            IConfiguration configuration = builder.Build();
+            BlobStorageConnection = configuration["ConnectionString"];
+
+            if(BlobStorageConnection == null)
             {
-                Console.WriteLine("You must pass the Blob Storage connection string as an argument when executing this application.");
-                BlobStorageConnection = Console.ReadLine();
-                //return 1;
-            }
-            else
-            {
-                BlobStorageConnection = args[0];
+                Console.WriteLine("You must provide a connection string");
+                Console.WriteLine("You can add the connection string to application secrets, at command line type: ");
+
+                var originalColor = Console.ForegroundColor;
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("dotnet user-secrets set \"ConnectionString\" \"<<your blob connection string>>\"");
+                Console.ForegroundColor = originalColor;
+                return 1;
             }
 
             int choice = 1;

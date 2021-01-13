@@ -3,6 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UserSecretsId>df8e879d-b9f5-44c9-930e-b680b5296efc</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -11,6 +12,9 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Azure.Storage.DataMovement" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.11" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="3.1.11" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="3.1.11" />
   </ItemGroup>
 
 </Project>
