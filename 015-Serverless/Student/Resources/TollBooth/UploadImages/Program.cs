@@ -32,27 +32,41 @@ namespace UploadImagesCore
 
             if(BlobStorageConnection == null)
             {
+                Console.WriteLine();
                 Console.WriteLine("You must provide a connection string");
                 Console.WriteLine("You can add the connection string to application secrets, at command line type: ");
 
                 var originalColor = Console.ForegroundColor;
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("dotnet user-secrets set \"ConnectionString\" \"<<your blob connection string>>\"");
+                Console.WriteLine("\tdotnet user-secrets set \"ConnectionString\" \"<<your blob connection string>>\"");
                 Console.ForegroundColor = originalColor;
                 return 1;
             }
 
-            int choice = 1;
-            Console.WriteLine("Enter one of the following numbers to indicate what type of image upload you want to perform:");
-            Console.WriteLine("\t1 - Upload a handful of test photos");
-            Console.WriteLine("\t2 - Upload 1000 photos to test processing at scale");
-            int.TryParse(Console.ReadLine(), out choice);
+            bool exit = false;
+            while(!exit)
+                    {
+                int choice = 1;
+                Console.WriteLine("Enter one of the following numbers to indicate what type of image upload you want to perform:");
+                Console.WriteLine("\t1 - Upload a handful of test photos");
+                Console.WriteLine("\t2 - Upload 1000 photos to test processing at scale");
+                Console.WriteLine("\tx - To exit the application");
 
-            bool upload1000 = choice == 2;
+                string input = Console.ReadLine();
 
-            UploadImages(upload1000);
+                if (string.Compare("x", input, true) == 0)
+                {
+                    exit = true;
+                }
+                else
+                {
+                    int.TryParse(input, out choice);
+                    bool upload1000 = choice == 2;
 
-            Console.ReadLine();
+                    UploadImages(upload1000);
+                }
+            }
+
 
             return 0;
         }
