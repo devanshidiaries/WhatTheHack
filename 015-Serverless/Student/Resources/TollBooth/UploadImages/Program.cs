@@ -10,6 +10,7 @@ using System.Net;
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
 using Microsoft.Azure.Storage.DataMovement;
+using Microsoft.Extensions.Configuration;
 
 namespace UploadImagesCore
 {
@@ -21,28 +22,51 @@ namespace UploadImagesCore
 
         static int Main(string[] args)
         {
-            if (args.Length == 0)
+
+            var builder = new ConfigurationBuilder()
+                .AddUserSecrets<Program>()
+                .AddCommandLine(args);
+
+            IConfiguration configuration = builder.Build();
+            BlobStorageConnection = configuration["ConnectionString"];
+
+            if(BlobStorageConnection == null)
             {
-                Console.WriteLine("You must pass the Blob Storage connection string as an argument when executing this application.");
-                BlobStorageConnection = Console.ReadLine();
-                //return 1;
+                Console.WriteLine();
+                Console.WriteLine("You must provide a connection string");
+                Console.WriteLine("You can add the connection string to application secrets, at command line type: ");
+
+                var originalColor = Console.ForegroundColor;
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("\tdotnet user-secrets set \"ConnectionString\" \"<<your blob connection string>>\"");
+                Console.ForegroundColor = originalColor;
+                return 1;
             }
-            else
-            {
-                BlobStorageConnection = args[0];
+
+            bool exit = false;
+            while(!exit)
+                    {
+                int choice = 1;
+                Console.WriteLine("Enter one of the following numbers to indicate what type of image upload you want to perform:");
+                Console.WriteLine("\t1 - Upload a handful of test photos");
+                Console.WriteLine("\t2 - Upload 1000 photos to test processing at scale");
+                Console.WriteLine("\tx - To exit the application");
+
+                string input = Console.ReadLine();
+
+                if (string.Compare("x", input, true) == 0)
+                {
+                    exit = true;
+                }
+                else
+                {
+                    int.TryParse(input, out choice);
+                    bool upload1000 = choice == 2;
+
+                    UploadImages(upload1000);
+                }
             }
 
-            int choice = 1;
-            Console.WriteLine("Enter one of the following numbers to indicate what type of image upload you want to perform:");
-            Console.WriteLine("\t1 - Upload a handful of test photos");
-            Console.WriteLine("\t2 - Upload 1000 photos to test processing at scale");
-            int.TryParse(Console.ReadLine(), out choice);
-
-            bool upload1000 = choice == 2;
-
-            UploadImages(upload1000);
-
-            Console.ReadLine();
 
             return 0;
         }
